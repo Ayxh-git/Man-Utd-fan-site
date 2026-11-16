@@ -491,17 +491,18 @@ function currentWeek(){
   const now=new Date(); const ok=QZ.weeks.filter(w=>new Date(w.start+'T00:00:00')<=now);
   return (ok.length?ok:QZ.weeks)[ (ok.length?ok:QZ.weeks).length-1 ];
 }
+const sbHeaders = () => QC.supabaseKey.startsWith('sb_') ? {apikey:QC.supabaseKey} : {apikey:QC.supabaseKey, Authorization:'Bearer '+QC.supabaseKey};
 const lbOn = () => !!(QC.supabaseUrl && QC.supabaseKey);
 async function lbFetch(week){
   const u=`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores?week=eq.${encodeURIComponent(week)}&select=name,score,time_ms&order=score.desc,time_ms.asc&limit=200`;
-  const r=await fetch(u,{headers:{apikey:QC.supabaseKey,Authorization:'Bearer '+QC.supabaseKey}});
+  const r=await fetch(u,{headers:sbHeaders()});
   if(!r.ok) throw new Error(r.status);
   const rows=await r.json(), seen=new Set(), top=[];
   for(const x of rows){ const k=x.name.trim().toLowerCase(); if(seen.has(k)) continue; seen.add(k); top.push(x); if(top.length===5) break; }
   return top;
 }
 async function lbSubmit(row){
-  const r=await fetch(`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores`,{method:'POST',headers:{apikey:QC.supabaseKey,Authorization:'Bearer '+QC.supabaseKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(row)});
+  const r=await fetch(`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores`,{method:'POST',headers:{...sbHeaders(),'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(row)});
   if(!r.ok) throw new Error(r.status);
 }
 const fmtSec = ms => (ms/1000).toFixed(1)+' сек';
