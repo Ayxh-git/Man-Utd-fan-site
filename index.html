@@ -160,6 +160,7 @@ tr.saf td{background:rgba(251,225,34,.07)}
 .qscore{font:700 64px Oswald;line-height:1;color:var(--gold)}
 .qrev{font-size:13px;margin-top:14px}
 .qrev div{padding:6px 0;border-bottom:1px dashed var(--line)}
+.inj{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:4px;background:#e0483d;color:#fff;font:800 13px/1 Inter;margin-left:6px;vertical-align:1px;cursor:help}
 footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .filters button{background:var(--panel);border:1px solid var(--line);color:var(--muted);font:600 13px Inter;padding:7px 14px;border-radius:20px;cursor:pointer}
@@ -396,6 +397,8 @@ $('#ov').onclick = e => { if(e.target.id==='ov') closeM(); };
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeM(); });
 
 /* ---------- Players ---------- */
+const INJ = Object.fromEntries(((D.injuries&&D.injuries.list)||[]).map(x=>[x.player,x]));
+const injMark = n => INJ[n] ? `<span class="inj" title="Гэмтэлтэй: ${esc(INJ[n].injury)} · Эргэн ирэх: ${esc(INJ[n].ret)}">+</span>` : '';
 let sortKey='ga', sortDir=-1;
 function renderPlayers(){
   const players = playerTable(matchesF());
@@ -404,7 +407,8 @@ function renderPlayers(){
   const rows=[...players].sort((a,b)=> sortKey==='name' ? sortDir*-1*a.name.localeCompare(b.name) : sortDir*(val(a,sortKey)-val(b,sortKey)) || b.apps-a.apps);
   $('#players').innerHTML = `<h2 style="margin-top:0">Тоглогчдын статистик</h2>
   <div class="card tablewrap"><table><thead><tr><th>#</th>${cols.map(([k,l])=>`<th data-k="${k}" class="${k===sortKey?'s':''}">${l}${k===sortKey?(sortDir<0?' ↓':' ↑'):''}</th>`).join('')}</tr></thead>
-  <tbody>${rows.map((p,i)=>`<tr><td class="muted">${i+1}</td><td><b>${esc(p.name)}</b></td><td>${p.apps}</td><td>${p.starts}</td><td>${p.goals||'–'}</td><td>${p.pens||'–'}</td><td>${p.assists||'–'}</td><td><b>${p.ga||'–'}</b></td><td>${p.avg!=null?rChip(p.avg)+` <span class="muted" style="font-size:11px">(${p.rN})</span>`:'–'}</td><td>${p.maxKm??'–'}</td></tr>`).join('')}</tbody></table></div>
+  <tbody>${rows.map((p,i)=>`<tr><td class="muted">${i+1}</td><td><b>${esc(p.name)}</b>${injMark(p.name)}</td><td>${p.apps}</td><td>${p.starts}</td><td>${p.goals||'–'}</td><td>${p.pens||'–'}</td><td>${p.assists||'–'}</td><td><b>${p.ga||'–'}</b></td><td>${p.avg!=null?rChip(p.avg)+` <span class="muted" style="font-size:11px">(${p.rN})</span>`:'–'}</td><td>${p.maxKm??'–'}</td></tr>`).join('')}</tbody></table></div>
+  ${D.injuries&&D.injuries.list.length?`<div class="card" style="margin-top:12px"><h3><span class="inj" style="margin:0 6px 0 0">+</span>Гэмтэлтэй тоглогчид</h3>${D.injuries.list.map(x=>`<div class="ev"><span style="flex:1"><b>${esc(x.player)}</b> <span class="muted">· ${esc(x.injury)}</span></span><span class="muted" style="font-size:12px;text-align:right">Эргэн ирэх: ${esc(x.ret)}</span></div>`).join('')}<p class="muted" style="font-size:11px;margin:8px 0 0">Эх сурвалж: ${esc(D.injuries.source)}</p></div>`:''}
   <p class="note">"Тоглолт" = гараанаас + сэлгээгээр орсон. Үнэлгээ: ${esc(D.sources.ratings)}, хаалтанд үнэлгээ авсан тоглолтын тоо. "Их гүйлт" = нийтлэгдсэн тоглолтуудаас хамгийн их гүйсэн зай (${esc(D.sources.physical)}). Өөрийн хаалгандаа оруулсан гоолыг тоглогчид тооцоогүй.</p>`;
   document.querySelectorAll('#players th[data-k]').forEach(th=>th.onclick=()=>{ const k=th.dataset.k; sortDir = k===sortKey ? -sortDir : -1; sortKey=k; renderPlayers(); });
 }
@@ -425,7 +429,7 @@ function renderFixtures(){
 /* ---------- History ---------- */
 function renderHistory(){
   const H = D.history;
-  const rows = H.managers.map(m=>({...m, pct: m.w/m.p*100}));
+  const rows = H.managers.map(m=>({...m, pct: m.p? m.w/m.p*100 : null}));
   const top = (key, label) => {
     const list = H.players.filter(p=> key==='ga' ? (p.g!=null && p.a!=null) : p[key]!=null)
       .map(p=>({...p, ga: (p.g??0)+(p.a??0)})).sort((a,b)=>b[key]-a[key]).slice(0,5);
@@ -433,8 +437,8 @@ function renderHistory(){
   };
   $('#history').innerHTML = `<h2 style="margin-top:0">Фергюсон болон түүнээс хойших дасгалжуулагчид</h2>
   <div class="card tablewrap"><table><thead><tr><th>Дасгалжуулагч</th><th>Хугацаа</th><th>Тоглолт</th><th>Хожсон</th><th>Тэнцсэн</th><th>Хожигдсон</th><th>Хожлын %</th><th></th></tr></thead>
-  <tbody>${rows.map(m=>`<tr class="${m.to===null?'cur':m.name.startsWith('Sir')?'saf':''}"><td><b>${esc(m.name)}</b>${m.role?` <span class="muted" style="font-size:12px">(${esc(m.role)})</span>`:''}</td><td class="muted" style="white-space:nowrap">${m.from} – ${m.to??'одоо'}</td><td>${m.p}</td><td>${m.w}</td><td>${m.d}</td><td>${m.l}</td><td><b>${m.pct.toFixed(1)}%</b></td>
-    <td><div class="hbar" title="Х ${m.w} · Т ${m.d} · Хж ${m.l}"><span style="width:${m.w/m.p*100}%;background:var(--win)"></span><span style="width:${m.d/m.p*100}%;background:var(--draw)"></span><span style="width:${m.l/m.p*100}%;background:var(--loss)"></span></div></td></tr>`).join('')}</tbody></table></div>
+  <tbody>${rows.map(m=>`<tr class="${m.to===null?'cur':m.name.startsWith('Sir')?'saf':''}"><td><b>${esc(m.name)}</b>${m.role?` <span class="muted" style="font-size:12px">(${esc(m.role)})</span>`:''}</td><td class="muted" style="white-space:nowrap">${m.from} – ${m.to??'одоо'}</td><td>${m.p}</td><td>${m.w}</td><td>${m.d}</td><td>${m.l}</td><td><b>${m.pct==null?'–':m.pct.toFixed(1)+'%'}</b></td>
+    <td><div class="hbar" title="Х ${m.w} · Т ${m.d} · Хж ${m.l}">${m.p?`<span style="width:${m.w/m.p*100}%;background:var(--win)"></span><span style="width:${m.d/m.p*100}%;background:var(--draw)"></span><span style="width:${m.l/m.p*100}%;background:var(--loss)"></span>`:""}</div></td></tr>`).join('')}</tbody></table></div>
   <p class="note">Бүх албан ёсны тэмцээн. Эх сурвалж: ${esc(H.managersSource)}. Өөр эх сурвалжид (жишээ нь Mourinho 144 тоглолт, Amorim 63 тоглолт) Community Shield зэргийг тооцсон эсэхээс хамаарч тоо бага зэрэг зөрдөг. Цөөн тоглолттой түр дасгалжуулагчдын хувь харьцуулахад төдийлөн утгагүй.</p>
   <h2>2013/14 оноос хойших шилдэг 5 тоглогч</h2>
   <div class="top5">${top('g','⚽ Хамгийн олон гоол')}${top('a','🅰️ Хамгийн олон оновчтой дамжуулалт')}${top('ga','🔥 Хамгийн олон гоол + дамжуулалт')}</div>
