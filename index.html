@@ -103,8 +103,28 @@ tbody tr:hover{background:var(--panel2)}
 .top5 .ev .m{width:26px}
 tr.cur td{background:rgba(218,41,28,.12)}
 tr.saf td{background:rgba(251,225,34,.07)}
-.tb{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font:700 8.5px Inter;letter-spacing:-.2px;vertical-align:middle;margin:0 6px;border:1.5px solid rgba(255,255,255,.35);flex:none}
+.tb{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font:700 8px Inter;letter-spacing:-.2px;vertical-align:middle;margin:0 6px;border:1.5px solid rgba(255,255,255,.35);flex:none}
 .tb.lg{width:54px;height:54px;font-size:15px;margin:0 auto 8px;display:grid;border-width:2px}
+.gcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.gcard{position:relative;overflow:hidden}
+.gcard .gt{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.gcard .gt h3{margin:0;font:600 17px Oswald;text-transform:uppercase;letter-spacing:.4px}
+.st{font:700 11px Inter;padding:4px 9px;border-radius:20px;letter-spacing:.4px;white-space:nowrap}
+.st.on{background:rgba(47,179,107,.18);color:#4fd88b;border:1px solid #2fb36b}
+.st.off{background:rgba(201,162,39,.16);color:#f0c64a;border:1px solid #c9a227}
+.st.out{background:rgba(224,72,61,.16);color:#ff7b70;border:1px solid #e0483d}
+.st.wait{background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.gbig{font:700 44px Oswald;line-height:1}
+.gbig small{font:500 15px Inter;color:var(--muted);margin-left:4px}
+.gcard .gl{color:var(--muted);font-size:13px;margin-top:8px}
+.gcard .gtarget{font-size:13px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.gcard.on{border-top:3px solid #2fb36b}.gcard.off{border-top:3px solid #c9a227}.gcard.out{border-top:3px solid #e0483d}.gcard.wait{border-top:3px solid #555}
+.ltab td,.ltab th{padding:7px 8px}
+.ltab tr.me td{background:rgba(218,41,28,.18);font-weight:700}
+.ltab tr.cut td{border-bottom:2px dashed #2fb36b}
+.ltab tr.cut8 td{border-bottom:2px dashed #6CABDD}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:860px){.twocol{grid-template-columns:1fr}}
 footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .filters button{background:var(--panel);border:1px solid var(--line);color:var(--muted);font:600 13px Inter;padding:7px 14px;border-radius:20px;cursor:pointer}
@@ -135,6 +155,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
       <button data-v="players">Тоглогчид</button>
       <button data-v="fixtures">Хуваарь</button>
       <button data-v="history">Түүх</button>
+      <button data-v="goals">Зорилго</button>
     </nav>
   </div>
 </header>
@@ -150,6 +171,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
   <section id="players" hidden></section>
   <section id="fixtures" hidden></section>
   <section id="history" hidden></section>
+  <section id="goals" hidden></section>
 </main>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <footer>Эх сурвалж: Sportradar (багийн статистик, бүрэлдэхүүн, хуваарь) · Sky Sports, NBC Sports, Sports Mole, Football Web Pages, 101GreatGoals (гоол, оновчтой дамжуулалт) · Sportsdunia (тоглогчийн үнэлгээ) · FotMob-ын өгөгдөл United in Focus, readmanutd-аар дамжуулан (гүйлт, хурд). Бүх албан ёсны тэмцээн: Премьер лиг, Аваргуудын лиг, EFL цом. Хожлын магадлал: StatsUltra. «Түүх» хэсэг: The People's Person, manutd.com, United in Focus, Goal, Reuters, Transfermarkt.</footer>
@@ -187,7 +209,15 @@ const TEAMS = {
   'Brentford':['BRE','#E30613','#fff'], 'Newcastle United':['NEW','#241F20','#fff'], 'Coventry City':['COV','#59CBE8','#111'],
   'RB Leipzig':['RBL','#f5f5f5','#DD0741'], 'Crystal Palace':['CRY','#1B458F','#C4122E'], 'Arsenal':['ARS','#EF0107','#fff'],
   'Nottingham Forest':['NFO','#DD0000','#fff'], 'Sunderland':['SUN','#EB172B','#fff'], 'Bayern Munich':['FCB','#DC052D','#fff'],
-  'Villarreal':['VIL','#FFE667','#005187']
+  'Villarreal':['VIL','#FFE667','#005187'],
+  'Paris Saint-Germain':['PSG','#004170','#DA291C'], 'Real Madrid':['RMA','#f5f5f5','#00529F'], 'Barcelona':['BAR','#A50044','#004D98'],
+  'Club Brugge':['BRU','#0067CE','#111'], 'Real Betis':['BET','#00954C','#fff'], 'Borussia Dortmund':['BVB','#FDE100','#111'],
+  'VfB Stuttgart':['VFB','#f5f5f5','#E32219'], 'Inter':['INT','#0068A8','#111'], 'LASK Linz':['LASK','#111','#fff'],
+  'Galatasaray':['GAL','#A90432','#FDB912'], 'Fenerbahçe':['FEN','#163962','#FFED00'], 'Shakhtar Donetsk':['SHA','#F26522','#111'],
+  'Viking':['VIK','#003C71','#fff'], 'PSV Eindhoven':['PSV','#ED1C24','#fff'], 'Bodø/Glimt':['BOD','#FFE500','#111'],
+  'FC Porto':['POR','#003893','#fff'], 'Napoli':['NAP','#12A0D7','#fff'], 'AEK Athens':['AEK','#FFD200','#111'],
+  'Feyenoord':['FEY','#E4002B','#fff'], 'Lens':['RCL','#FFD700','#E30613'], 'Slavia Praha':['SLA','#E30613','#fff'],
+  'Lille':['LIL','#E01E13','#20325F'], 'Slovan Bratislava':['SLO','#5DADE2','#fff']
 };
 function badge(name, big){
   const t = TEAMS[name] || [String(name).replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase(), '#444', '#fff'];
@@ -374,11 +404,49 @@ function renderHistory(){
   ${H.players.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td class="muted">${esc(p.years)}</td><td>${p.g}</td><td>${p.a??'–'}</td><td>${p.a!=null?p.g+p.a:'–'}</td><td class="muted" style="text-align:left;font-size:12px">${esc(p.src)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
+
+/* ---------- Goals ---------- */
+function goalStatus(c){
+  if(c.type==='cup') return c.status==='out'?'out':c.status==='notstarted'?'wait':'on';
+  const me=c.table.find(r=>r.team==='Man United');
+  return me.rank<=c.cutoff?'on':'off';
+}
+const ST_TXT={on:'ON-TRACK',off:'OFF-TRACK',out:'ХАСАГДСАН',wait:'ЭХЛЭЭГҮЙ · ON-TRACK'};
+function renderGoals(){
+  const G=D.goals; if(!G){ $('#goals').innerHTML=''; return; }
+  const cards=G.comps.map(c=>{
+    const st=goalStatus(c); let body='';
+    if(c.type==='league'){
+      const me=c.table.find(r=>r.team==='Man United'), cut=c.table[c.cutoff-1];
+      const gap=cut.pts-me.pts;
+      body=`<div class="gbig">${me.rank}<small>/ ${c.of}-р байр</small></div>
+        <div class="gl">${me.p} тоглолт · ${me.w}-${me.d}-${me.l} · <b>${me.pts} оноо</b></div>
+        <div class="gl">${st==='on'? (c.cutoff===24 && c.top8 ? `24-р байрнаас ${me.pts-cut.pts} оноогоор илүү · шилдэг 8-аас ${c.table[c.top8-1].pts-me.pts} оноогоор хоцорч байна` : `${c.cutoff}-р байрын шугамаас дээгүүр`) : `${c.cutoff}-р байраас <b>${gap} оноогоор</b> хоцорч байна`}</div>`;
+    } else {
+      body=`<div class="gbig" style="font-size:30px">${esc(c.stage)}</div><div class="gl">${esc(c.detail)}</div>`;
+    }
+    return `<div class="card gcard ${st}"><div class="gt"><h3>${esc(c.name)}</h3><span class="st ${st}">${ST_TXT[st]}</span></div>${body}<div class="gtarget">🎯 Зорилго: <b>${esc(c.target)}</b></div></div>`;
+  }).join('');
+  const ltable=c=>{
+    const cls=r=>[r.team==='Man United'?'me':'', r.rank===c.cutoff?'cut':'', c.top8&&r.rank===c.top8?'cut8':''].join(' ');
+    return `<div class="card tablewrap" style="padding:8px 10px"><h3 style="margin:8px 6px 6px">${esc(c.name)} — хүснэгт</h3><table class="ltab"><thead><tr><th>#</th><th>Баг</th><th>Т</th><th>Х</th><th>Тэ</th><th>Хж</th><th>Оноо</th></tr></thead><tbody>
+    ${c.table.map(r=>`<tr class="${cls(r)}"><td class="muted">${r.rank}</td><td style="white-space:nowrap">${badge(r.team)}${esc(r.team)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table>
+    <p class="muted" style="font-size:11px;margin:8px 6px">${c.key==='PL'?'Ногоон тасархай шугам = Топ 5-ын зорилгын хил.':'Цэнхэр шугам = шилдэг 8 (шууд 1/8) · ногоон шугам = эхний 24 (on-track хил).'} ${esc(c.note||'')}</p></div>`;
+  };
+  const leagues=G.comps.filter(c=>c.type==='league');
+  const onCount=G.comps.filter(c=>['on','wait'].includes(goalStatus(c))).length;
+  $('#goals').innerHTML=`<h2 style="margin-top:0">2026/27 улирлын зорилго</h2>
+  <p class="muted" style="margin-top:-4px">${onCount}/${G.comps.length} тэмцээнд зорилгынхоо дагуу явж байна · Хүснэгт шинэчилсэн: ${esc(G.updated)} (${esc(G.source)})</p>
+  <div class="gcards">${cards}</div>
+  <h2>Хүснэгтүүд</h2><div class="twocol">${leagues.map(ltable).join('')}</div>
+  <p class="note">Дүрэм: Премьер лигт топ 5-д байвал on-track. Аваргуудын лигт лигийн шатанд эхний 24-т байвал on-track (эцсийн зорилго түрүүлэх). Цомын тэмцээнд хасагдаагүй л бол on-track.</p>`;
+}
+
 /* ---------- Router & filters ---------- */
-const views=['overview','matches','players','fixtures','history'];
-function show(v){ views.forEach(x=>$('#'+x).hidden = x!==v); $('#filters').style.display = v==='history'?'none':''; document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+const views=['overview','matches','players','fixtures','history','goals'];
+function show(v){ views.forEach(x=>$('#'+x).hidden = x!==v); $('#filters').style.display = (v==='history'||v==='goals')?'none':''; document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ location.hash=b.dataset.v; });
-function renderAll(){ document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.c===comp)); renderOverview(); renderMatches(); renderPlayers(); renderFixtures(); renderHistory(); }
+function renderAll(){ document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.c===comp)); renderOverview(); renderMatches(); renderPlayers(); renderFixtures(); renderHistory(); renderGoals(); }
 document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{ comp=b.dataset.c; try{localStorage.setItem('mu-comp',comp);}catch(e){} renderAll(); });
 function route(){
   const h = location.hash.slice(1);
