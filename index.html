@@ -127,8 +127,8 @@ tr.saf td{background:rgba(251,225,34,.07)}
 .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:860px){.twocol{grid-template-columns:1fr}}
 @media(max-width:600px){
-  nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;overflow:visible;margin-top:16px;padding-bottom:12px}
-  nav button{border-radius:10px;background:rgba(0,0,0,.22);padding:10px 4px;font-size:13px;white-space:normal}
+  nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;overflow:visible;margin-top:16px;padding-bottom:12px}
+  nav button{border-radius:10px;background:rgba(0,0,0,.22);padding:10px 2px;font-size:12px;white-space:normal}
   nav button.on{background:var(--bg);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
   .fx{grid-template-columns:1fr;gap:6px;padding:12px 14px}
   .fx .prob{width:100%;height:10px}
@@ -139,6 +139,27 @@ tr.saf td{background:rgba(251,225,34,.07)}
   .tb{margin:0 4px}
   .ltab td,.ltab th{padding:6px 5px;font-size:13px}
 }
+.qwrap{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;align-items:start}
+@media(max-width:860px){.qwrap{grid-template-columns:1fr}}
+.qprog{height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;margin:4px 0 18px}
+.qprog span{display:block;height:100%;background:var(--red);transition:width .3s}
+.qq{font:600 19px/1.4 Inter;margin:0 0 16px}
+.qopts{display:grid;gap:8px}
+.qopt{text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--text);font:500 15px Inter;padding:13px 14px;border-radius:10px;cursor:pointer;transition:border-color .15s,background .15s}
+.qopt:hover:not(:disabled){border-color:#666}
+.qopt.ok{background:rgba(47,179,107,.18);border-color:#2fb36b}
+.qopt.bad{background:rgba(224,72,61,.18);border-color:#e0483d}
+.qopt:disabled{cursor:default}
+.qexp{font-size:13px;color:var(--muted);margin-top:12px;min-height:20px}
+.btn{background:var(--red);color:#fff;border:0;font:600 15px Inter;padding:12px 20px;border-radius:10px;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:var(--panel2);border:1px solid var(--line)}
+.qin{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);font:500 16px Inter;padding:12px 14px;border-radius:10px;margin:8px 0 14px}
+.lb .ev .m{width:28px}
+.lb .medal{font-size:18px}
+.qscore{font:700 64px Oswald;line-height:1;color:var(--gold)}
+.qrev{font-size:13px;margin-top:14px}
+.qrev div{padding:6px 0;border-bottom:1px dashed var(--line)}
 footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .filters button{background:var(--panel);border:1px solid var(--line);color:var(--muted);font:600 13px Inter;padding:7px 14px;border-radius:20px;cursor:pointer}
@@ -170,6 +191,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
       <button data-v="fixtures">Хуваарь</button>
       <button data-v="history">Түүх</button>
       <button data-v="goals">Зорилго</button>
+      <button data-v="quiz">Quiz</button>
     </nav>
   </div>
 </header>
@@ -186,11 +208,14 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
   <section id="fixtures" hidden></section>
   <section id="history" hidden></section>
   <section id="goals" hidden></section>
+  <section id="quiz" hidden></section>
 </main>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <footer>Эх сурвалж: Sportradar (багийн статистик, бүрэлдэхүүн, хуваарь) · Sky Sports, NBC Sports, Sports Mole, Football Web Pages, 101GreatGoals (гоол, оновчтой дамжуулалт) · Sportsdunia (тоглогчийн үнэлгээ) · FotMob-ын өгөгдөл United in Focus, readmanutd-аар дамжуулан (гүйлт, хурд). Бүх албан ёсны тэмцээн: Премьер лиг, Аваргуудын лиг, EFL цом. Хожлын магадлал: StatsUltra. «Түүх» хэсэг: The People's Person, manutd.com, United in Focus, Goal, Reuters, Transfermarkt.</footer>
 
 <script src="data.js"></script>
+<script src="quiz.js"></script>
+<script src="quiz-config.js"></script>
 <script>
 const D = window.MU_DATA;
 const $ = s => document.querySelector(s);
@@ -456,11 +481,97 @@ function renderGoals(){
   <p class="note">Дүрэм: Премьер лигт топ 5-д байвал on-track. Аваргуудын лигт лигийн шатанд эхний 24-т байвал on-track (эцсийн зорилго түрүүлэх). Цомын тэмцээнд хасагдаагүй л бол on-track.</p>`;
 }
 
+
+/* ---------- Quiz ---------- */
+const QZ = window.MU_QUIZ, QC = window.MU_QUIZ_CONFIG || {};
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
+function currentWeek(){
+  if(!QZ||!QZ.weeks.length) return null;
+  const now=new Date(); const ok=QZ.weeks.filter(w=>new Date(w.start+'T00:00:00')<=now);
+  return (ok.length?ok:QZ.weeks)[ (ok.length?ok:QZ.weeks).length-1 ];
+}
+const lbOn = () => !!(QC.supabaseUrl && QC.supabaseKey);
+async function lbFetch(week){
+  const u=`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores?week=eq.${encodeURIComponent(week)}&select=name,score,time_ms&order=score.desc,time_ms.asc&limit=200`;
+  const r=await fetch(u,{headers:{apikey:QC.supabaseKey,Authorization:'Bearer '+QC.supabaseKey}});
+  if(!r.ok) throw new Error(r.status);
+  const rows=await r.json(), seen=new Set(), top=[];
+  for(const x of rows){ const k=x.name.trim().toLowerCase(); if(seen.has(k)) continue; seen.add(k); top.push(x); if(top.length===5) break; }
+  return top;
+}
+async function lbSubmit(row){
+  const r=await fetch(`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores`,{method:'POST',headers:{apikey:QC.supabaseKey,Authorization:'Bearer '+QC.supabaseKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(row)});
+  if(!r.ok) throw new Error(r.status);
+}
+const fmtSec = ms => (ms/1000).toFixed(1)+' сек';
+let QS = null; // quiz state
+function renderQuiz(){
+  const W=currentWeek(); const el=$('#quiz');
+  if(!W){ el.innerHTML='<p class="muted">Quiz бэлэн болоогүй байна.</p>'; return; }
+  const done=lsGet('mu-quiz-'+W.id,null);
+  const name=lsGet('mu-quiz-name','');
+  let main='';
+  if(QS && QS.week===W.id && !QS.finished){
+    const i=QS.i, Q=W.questions[i], ans=QS.answers[i];
+    main=`<div class="muted" style="font-size:13px">Асуулт ${i+1} / ${W.questions.length} · Оноо: ${QS.answers.filter((a,j)=>a===W.questions[j].a).length}</div>
+      <div class="qprog"><span style="width:${(i)/W.questions.length*100}%"></span></div>
+      <p class="qq">${esc(Q.q)}</p>
+      <div class="qopts">${Q.o.map((o,k)=>`<button class="qopt ${ans!=null?(k===Q.a?'ok':(k===ans?'bad':'')):''}" data-k="${k}" ${ans!=null?'disabled':''}>${'ABCD'[k]}. ${esc(o)}</button>`).join('')}</div>
+      <div class="qexp">${ans!=null?(ans===Q.a?'✅ Зөв! ':'❌ Буруу. ')+esc(Q.e||''):''}</div>
+      <div style="margin-top:14px;text-align:right">${ans!=null?`<button class="btn" id="qnext">${i+1<W.questions.length?'Дараагийн асуулт →':'Дуусгах'}</button>`:''}</div>`;
+  } else if(done){
+    main=`<div class="muted" style="font-size:13px">Энэ долоо хоногийн quiz-ийг бөглөсөн</div>
+      <div style="display:flex;align-items:baseline;gap:10px;margin:8px 0"><span class="qscore">${done.score}</span><span class="muted">/ ${W.questions.length} · ${fmtSec(done.time_ms)}</span></div>
+      <p style="margin:6px 0 0">${esc(done.name)}, ${done.score>=10?'жинхэнэ Red Devil байна! 🔴':done.score>=7?'сайн байна, гэхдээ ахиад жаахан!':'дараагийн долоо хоногт амжилт!'}</p>
+      <p class="muted" style="font-size:13px">${done.sent?'Таны оноо leaderboard-д илгээгдсэн.':(lbOn()?'Оноо илгээгдээгүй — <a href="#" id="qresend">дахин илгээх</a>':'')}</p>
+      <div class="qrev"><b>Хариултууд</b>${W.questions.map((Q,j)=>`<div>${done.answers[j]===Q.a?'✅':'❌'} ${esc(Q.q)} — <b>${esc(Q.o[Q.a])}</b></div>`).join('')}</div>
+      <p class="muted" style="font-size:12px;margin-top:12px">Дараагийн quiz ирэх Даваа гарагт гарна.</p>`;
+  } else {
+    main=`<h3 style="font:600 20px Oswald;text-transform:uppercase;margin:0 0 4px">${esc(W.title||'Долоо хоногийн quiz')}</h3>
+      <p class="muted" style="margin:0 0 12px">${W.questions.length} асуулт · Зөвхөн жинхэнэ фэн л мэднэ. Оноо тэнцвэл хурдан бөглөсөн нь дээр жагсана.</p>
+      <label style="font-size:13px">Таны нэр (leaderboard-д харагдана)</label>
+      <input class="qin" id="qname" maxlength="20" placeholder="ж: Bat-Erdene" value="${esc(name)}">
+      <button class="btn" id="qstart">Эхлэх ▶</button>
+      <p class="muted" style="font-size:12px;margin-top:10px">Бүртгэл шаардлагагүй. Нэг төхөөрөмжөөс долоо хоногт нэг удаа бөглөнө.</p>`;
+  }
+  el.innerHTML=`<h2 style="margin-top:0">Долоо хоногийн quiz</h2>
+   <p class="muted" style="margin-top:-4px">${esc(W.id)} · ${esc(W.start)}-нээс эхэлсэн</p>
+   <div class="qwrap"><div class="card" style="padding:20px">${main}</div>
+   <div class="card lb"><h3>🏆 Энэ долоо хоногийн Top 5</h3><div id="qlb"><p class="muted" style="font-size:13px">${lbOn()?'Ачаалж байна…':'Leaderboard тохируулагдаагүй байна.'}</p></div></div></div>`;
+  // events
+  const st=$('#qstart'); if(st) st.onclick=()=>{ const n=$('#qname').value.trim(); if(!n){ $('#qname').focus(); $('#qname').style.borderColor='var(--red)'; return; } lsSet('mu-quiz-name',n); QS={week:W.id,name:n,i:0,answers:[],t0:Date.now(),finished:false}; renderQuiz(); };
+  document.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{ if(QS.answers[QS.i]!=null) return; QS.answers[QS.i]=+b.dataset.k; renderQuiz(); });
+  const nx=$('#qnext'); if(nx) nx.onclick=()=>{ if(QS.i+1<W.questions.length){ QS.i++; renderQuiz(); } else finishQuiz(W); };
+  const rs=$('#qresend'); if(rs) rs.onclick=e=>{ e.preventDefault(); sendScore(W, lsGet('mu-quiz-'+W.id,null)); };
+  loadLb(W);
+}
+async function finishQuiz(W){
+  const score=QS.answers.filter((a,j)=>a===W.questions[j].a).length;
+  const rec={name:QS.name,score,time_ms:Math.max(5000,Date.now()-QS.t0),answers:QS.answers,sent:false};
+  QS.finished=true; lsSet('mu-quiz-'+W.id,rec);
+  renderQuiz(); await sendScore(W,rec);
+}
+async function sendScore(W,rec){
+  if(!lbOn()||!rec||rec.sent) return;
+  try{ await lbSubmit({week:W.id,name:rec.name.slice(0,20),score:rec.score,time_ms:Math.max(5000,Math.min(rec.time_ms,3600000))}); rec.sent=true; lsSet('mu-quiz-'+W.id,rec); }catch(e){}
+  if(!$('#quiz').hidden) renderQuiz();
+}
+async function loadLb(W){
+  if(!lbOn()) return;
+  const box=$('#qlb'); const me=lsGet('mu-quiz-name','').toLowerCase();
+  try{
+    const top=await lbFetch(W.id);
+    box.innerHTML = top.length ? top.map((x,i)=>`<div class="ev" style="${x.name.toLowerCase()===me?'background:rgba(218,41,28,.15);border-radius:6px':''}"><span class="m medal">${['🥇','🥈','🥉','4','5'][i]}</span><span style="flex:1"><b>${esc(x.name)}</b> <span class="muted" style="font-size:12px">${fmtSec(x.time_ms)}</span></span><b style="font:700 20px Oswald">${x.score}</b></div>`).join('')
+      : '<p class="muted" style="font-size:13px">Одоогоор хэн ч бөглөөгүй. Анхных нь болоорой!</p>';
+  }catch(e){ box.innerHTML='<p class="muted" style="font-size:13px">Leaderboard ачаалж чадсангүй. Энэ хуудсанд гадаад холболт хаалттай байж магадгүй — GitHub сайт дээр нээнэ үү.</p>'; }
+}
+
 /* ---------- Router & filters ---------- */
-const views=['overview','matches','players','fixtures','history','goals'];
-function show(v){ views.forEach(x=>$('#'+x).hidden = x!==v); $('#filters').style.display = (v==='history'||v==='goals')?'none':''; document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+const views=['overview','matches','players','fixtures','history','goals','quiz'];
+function show(v){ views.forEach(x=>$('#'+x).hidden = x!==v); $('#filters').style.display = (v==='history'||v==='goals'||v==='quiz')?'none':''; if(v==='quiz') renderQuiz(); document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ location.hash=b.dataset.v; });
-function renderAll(){ document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.c===comp)); renderOverview(); renderMatches(); renderPlayers(); renderFixtures(); renderHistory(); renderGoals(); }
+function renderAll(){ document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.c===comp)); renderOverview(); renderMatches(); renderPlayers(); renderFixtures(); renderHistory(); renderGoals(); renderQuiz(); }
 document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{ comp=b.dataset.c; try{localStorage.setItem('mu-comp',comp);}catch(e){} renderAll(); });
 function route(){
   const h = location.hash.slice(1);
