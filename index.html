@@ -92,6 +92,8 @@ tbody tr:hover{background:var(--panel2)}
 .top5 .ev .m{width:26px}
 tr.cur td{background:rgba(218,41,28,.12)}
 tr.saf td{background:rgba(251,225,34,.07)}
+.tb{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font:700 8.5px Inter;letter-spacing:-.2px;vertical-align:middle;margin:0 6px;border:1.5px solid rgba(255,255,255,.35);flex:none}
+.tb.lg{width:54px;height:54px;font-size:15px;margin:0 auto 8px;display:grid;border-width:2px}
 footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .filters button{background:var(--panel);border:1px solid var(--line);color:var(--muted);font:600 13px Inter;padding:7px 14px;border-radius:20px;cursor:pointer}
@@ -160,6 +162,26 @@ try { comp = localStorage.getItem('mu-comp') || 'ALL'; } catch(e) {}
 const matchesF = () => comp==='ALL' ? ALL : ALL.filter(m=>m.comp===comp);
 $('#season').textContent = D.season;
 $('#upd').textContent = D.updated;
+
+
+/* ---------- Team badges (club colours + abbreviation, not official crests) ---------- */
+const TEAMS = {
+  'Man United':['MUN','#DA291C','#FBE122'], 'Hull City':['HUL','#F5A12D','#111'], 'Ipswich Town':['IPS','#0044A9','#fff'],
+  'Everton':['EVE','#003399','#fff'], 'Sabah':['SAB','#1d1d1b','#f4a300'], 'Manchester City':['MCI','#6CABDD','#1c2c5b'],
+  'Brighton & Hove Albion':['BHA','#0057B8','#fff'], 'Fulham':['FUL','#f5f5f5','#111'], 'Tottenham Hotspur':['TOT','#f5f5f5','#132257'],
+  'Atlético Madrid':['ATM','#CB3524','#fff'], 'Leeds United':['LEE','#f5f5f5','#1D428A'], 'Como':['COM','#1b3f8b','#fff'],
+  'AFC Bournemouth':['BOU','#DA291C','#111'], 'Chelsea':['CHE','#034694','#fff'], 'AS Roma':['ROM','#8E1F2F','#F0BC42'],
+  'Aston Villa':['AVL','#670E36','#95BFE5'], 'Liverpool':['LIV','#C8102E','#fff'], 'Sporting CP':['SCP','#008057','#fff'],
+  'Brentford':['BRE','#E30613','#fff'], 'Newcastle United':['NEW','#241F20','#fff'], 'Coventry City':['COV','#59CBE8','#111'],
+  'RB Leipzig':['RBL','#f5f5f5','#DD0741'], 'Crystal Palace':['CRY','#1B458F','#C4122E'], 'Arsenal':['ARS','#EF0107','#fff'],
+  'Nottingham Forest':['NFO','#DD0000','#fff'], 'Sunderland':['SUN','#EB172B','#fff'], 'Bayern Munich':['FCB','#DC052D','#fff'],
+  'Villarreal':['VIL','#FFE667','#005187']
+};
+function badge(name, big){
+  const t = TEAMS[name] || [String(name).replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase(), '#444', '#fff'];
+  return `<span class="tb${big?' lg':''}" style="background:${t[1]};color:${t[2]}" title="${esc(name)}">${t[0]}</span>`;
+}
+const vsLine = (home, away) => `${badge(home)}${esc(home)} <span class="muted">vs</span> ${badge(away)}${esc(away)}`;
 
 /* ---------- Player aggregation ---------- */
 function playerTable(ms){
@@ -238,7 +260,7 @@ function renderMatches(){
     const rs = Object.entries(m.ratings||{}).sort((a,b)=>b[1]-a[1])[0];
     return `<div class="match" data-id="${m.id}">
       <div class="rd">${compTag(m.comp)}<b style="font-size:13px;margin-top:4px">${fmtDate(m.date)}</b></div>
-      <div><div class="opp">${m.venue==='H'?'Man United vs '+esc(m.opponent):esc(m.opponent)+' vs Man United'} <span class="ha">${m.venue==='H'?'ГЭРТЭЭ':'ЗОЧИН'}</span></div>
+      <div><div class="opp">${m.venue==='H'?vsLine('Man United',m.opponent):vsLine(m.opponent,'Man United')} <span class="ha">${m.venue==='H'?'ГЭРТЭЭ':'ЗОЧИН'}</span></div>
         <div class="meta">${esc(COMP_MN[m.comp])} · ${esc(m.round)} · ${esc(m.stadium)}${scorers?' · ⚽ '+esc(scorers):''}${rs?` · ⭐ ${esc(rs[0])} ${rs[1].toFixed(1)}`:''}</div></div>
       <div class="score ${r}">${sc}</div></div>`;}).join('')}</div>
   <p class="muted" style="font-size:13px">Тоглолт дээр дарж дэлгэрэнгүй статистик, бүрэлдэхүүн, тоглогчдын үнэлгээг харна уу.</p>`;
@@ -263,7 +285,7 @@ function openMatch(id){
   $('#modal').innerHTML = `
     <div class="mh"><button class="x" onclick="closeM()">✕</button>
       <div style="font-size:13px;color:#ffd9d5;margin-bottom:10px">${esc(COMP_MN[m.comp])} · ${esc(m.round)} · ${fmtDate(m.date)} · ${esc(m.stadium)}</div>
-      <div class="sb"><div class="t">${esc(L.n)}</div><div class="n">${L.s} – ${R.s}</div><div class="t">${esc(R.n)}</div></div>
+      <div class="sb"><div class="t">${badge(L.n,1)}${esc(L.n)}</div><div class="n">${L.s} – ${R.s}</div><div class="t">${badge(R.n,1)}${esc(R.n)}</div></div>
       <div style="text-align:center;margin-top:8px"><span class="score ${res(m)}" style="font-size:13px;padding:3px 10px">${RES_MN[res(m)]}</span></div>
     </div>
     <div class="mb">
@@ -312,7 +334,7 @@ function renderFixtures(){
   $('#fixtures').innerHTML = `<h2 style="margin-top:0">Удахгүй болох тоглолтууд</h2>
   <div class="card list">${up.map(f=>`<div class="fx">
     <div><b>${fmtDate(f.date)}</b><div class="muted" style="font-size:12px">${fmtTime(f.date)} (таны цагаар)</div></div>
-    <div><b>${f.venue==='H'?'Man United vs '+esc(f.opponent):esc(f.opponent)+' vs Man United'}</b>${compTag(f.comp)}<span class="ha">${f.venue==='H'?'ГЭРТЭЭ':'ЗОЧИН'}</span></div>
+    <div><b>${f.venue==='H'?vsLine('Man United',f.opponent):vsLine(f.opponent,'Man United')}</b>${compTag(f.comp)}<span class="ha">${f.venue==='H'?'ГЭРТЭЭ':'ЗОЧИН'}</span></div>
     <div>${f.winProb?`<div class="prob" title="Ялах ${f.winProb.mu}% · Тэнцэх ${f.winProb.draw}% · Хожигдох ${f.winProb.opp}%"><span style="width:${f.winProb.mu}%;background:var(--red)"></span><span style="width:${f.winProb.draw}%;background:#666"></span><span style="width:${f.winProb.opp}%;background:#aaa"></span></div><div style="font-size:11px;margin-top:4px;white-space:nowrap"><b style="color:#ff6b5e">Ялах ${f.winProb.mu}%</b> <span class="muted">· Тэнцэх ${f.winProb.draw}% · Хожигдох ${f.winProb.opp}%</span></div>`:'<span class="muted" style="font-size:11px">Магадлал хараахан гараагүй</span>'}</div>
   </div>`).join('') || '<p class="muted" style="padding:14px">Хуваарьт тоглолт алга.</p>'}</div>
   <p class="note">Хожлын магадлал: ${esc(D.sources.winProb||'')}. Шинэчлэлт бүрт дахин татагдана. Тоглолт бүрийн дараа энэ хуудсанд шинэ үр дүн, статистик, бүрэлдэхүүн, үнэлгээ нэмэгдэнэ.</p>`;
