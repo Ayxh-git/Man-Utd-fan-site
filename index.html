@@ -138,7 +138,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
   <section id="history" hidden></section>
 </main>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
-<footer>Эх сурвалж: Sportradar (багийн статистик, бүрэлдэхүүн, хуваарь) · Sky Sports, NBC Sports, Sports Mole, Football Web Pages, 101GreatGoals (гоол, оновчтой дамжуулалт) · Sportsdunia (тоглогчийн үнэлгээ) · FotMob-ын өгөгдөл United in Focus, readmanutd-аар дамжуулан (гүйлт, хурд). Бүх албан ёсны тэмцээн: Премьер лиг, Аваргуудын лиг, EFL цом. «Түүх» хэсэг: The People's Person, manutd.com, United in Focus, Goal, Reuters, Transfermarkt.</footer>
+<footer>Эх сурвалж: Sportradar (багийн статистик, бүрэлдэхүүн, хуваарь) · Sky Sports, NBC Sports, Sports Mole, Football Web Pages, 101GreatGoals (гоол, оновчтой дамжуулалт) · Sportsdunia (тоглогчийн үнэлгээ) · FotMob-ын өгөгдөл United in Focus, readmanutd-аар дамжуулан (гүйлт, хурд). Бүх албан ёсны тэмцээн: Премьер лиг, Аваргуудын лиг, EFL цом. Хожлын магадлал: StatsUltra. «Түүх» хэсэг: The People's Person, manutd.com, United in Focus, Goal, Reuters, Transfermarkt.</footer>
 
 <script src="data.js"></script>
 <script>
@@ -251,7 +251,7 @@ function openMatch(id){
   if(location.hash!=='#m'+idx) history.replaceState(null,'','#m'+idx);
   const L = m.venue==='H' ? {n:'Man United',s:m.score.mu} : {n:m.opponent,s:m.score.opp};
   const R = m.venue==='H' ? {n:m.opponent,s:m.score.opp} : {n:'Man United',s:m.score.mu};
-  const rows = [['poss','Эзэмшил %'],['shots','Цохилт'],['sot','Хаалга руу'],['corners','Булан'],['fouls','Алдаа'],['offsides','Офсайд'],['saves','Хаалгачийн аврал*'],['yellow','Шар хуудас'],['red','Улаан хуудас']];
+  const rows = [['poss','Эзэмшил %'],['shots','Цохилт'],['sot','Хаалга руу'],['corners','Булан'],['fouls','Алдаа'],['offsides','Офсайд'],['saves','Хаалгачийн save*'],['yellow','Шар хуудас'],['red','Улаан хуудас']];
   const ev = [
     ...m.goals.map(g=>({min:g.min, t:`⚽ <b>${esc(g.player)}</b>${g.pen?' (пенальти)':''}${g.assist?` <span class="muted">· дамжуулалт: ${esc(g.assist)}</span>`:''}`, mu:true})),
     ...m.oppGoals.map(g=>({min:g.min, t:`⚽ ${esc(m.opponent)}${g.player?': '+esc(g.player):''}`, mu:false}))
@@ -313,9 +313,9 @@ function renderFixtures(){
   <div class="card list">${up.map(f=>`<div class="fx">
     <div><b>${fmtDate(f.date)}</b><div class="muted" style="font-size:12px">${fmtTime(f.date)} (таны цагаар)</div></div>
     <div><b>${f.venue==='H'?'Man United vs '+esc(f.opponent):esc(f.opponent)+' vs Man United'}</b>${compTag(f.comp)}<span class="ha">${f.venue==='H'?'ГЭРТЭЭ':'ЗОЧИН'}</span></div>
-    <div>${f.winProb?`<div class="prob" title="Ялах ${f.winProb.mu}% · Тэнцэх ${f.winProb.draw}% · Хожигдох ${f.winProb.opp}%"><span style="width:${f.winProb.mu}%;background:var(--red)"></span><span style="width:${f.winProb.draw}%;background:#666"></span><span style="width:${f.winProb.opp}%;background:#aaa"></span></div><div class="muted" style="font-size:11px;margin-top:3px">Ялах магадлал ${f.winProb.mu}%</div>`:''}</div>
+    <div>${f.winProb?`<div class="prob" title="Ялах ${f.winProb.mu}% · Тэнцэх ${f.winProb.draw}% · Хожигдох ${f.winProb.opp}%"><span style="width:${f.winProb.mu}%;background:var(--red)"></span><span style="width:${f.winProb.draw}%;background:#666"></span><span style="width:${f.winProb.opp}%;background:#aaa"></span></div><div style="font-size:11px;margin-top:4px;white-space:nowrap"><b style="color:#ff6b5e">Ялах ${f.winProb.mu}%</b> <span class="muted">· Тэнцэх ${f.winProb.draw}% · Хожигдох ${f.winProb.opp}%</span></div>`:'<span class="muted" style="font-size:11px">Магадлал хараахан гараагүй</span>'}</div>
   </div>`).join('') || '<p class="muted" style="padding:14px">Хуваарьт тоглолт алга.</p>'}</div>
-  <p class="note">Тоглолт бүрийн дараа энэ хуудсанд шинэ үр дүн, статистик, бүрэлдэхүүн, үнэлгээ нэмэгдэнэ.</p>`;
+  <p class="note">Хожлын магадлал: ${esc(D.sources.winProb||'')}. Шинэчлэлт бүрт дахин татагдана. Тоглолт бүрийн дараа энэ хуудсанд шинэ үр дүн, статистик, бүрэлдэхүүн, үнэлгээ нэмэгдэнэ.</p>`;
 }
 
 

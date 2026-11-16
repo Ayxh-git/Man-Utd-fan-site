@@ -11,7 +11,8 @@ window.MU_DATA = {
   sources: {
     ratings: "Sportsdunia",
     physical: "FotMob (United in Focus, readmanutd)",
-    stats: "Sportradar"
+    stats: "Sportradar",
+    winProb: "StatsUltra (15 000 улирлын симуляц, 2026-11-16)"
   },
   matches: [
     {
@@ -307,20 +308,20 @@ window.MU_DATA = {
     ]
   },
   fixtures: [
-    { date: "2026-11-22T16:30:00Z", comp: "PL", opponent: "Liverpool", venue: "A", winProb: { mu: 22.8, draw: 22.6, opp: 54.6 } },
-    { date: "2026-11-25T20:00:00Z", comp: "UCL", opponent: "Sporting CP", venue: "A" },
-    { date: "2026-11-28T15:00:00Z", comp: "PL", opponent: "Brentford", venue: "H" },
-    { date: "2026-12-02T20:15:00Z", comp: "PL", opponent: "Newcastle United", venue: "A" },
-    { date: "2026-12-05T15:00:00Z", comp: "PL", opponent: "Coventry City", venue: "H" },
-    { date: "2026-12-08T20:00:00Z", comp: "UCL", opponent: "RB Leipzig", venue: "H" },
-    { date: "2026-12-13T19:00:00Z", comp: "PL", opponent: "Crystal Palace", venue: "A" },
+    { date: "2026-11-22T16:30:00Z", comp: "PL", opponent: "Liverpool", venue: "A", winProb: { mu: 26, draw: 23, opp: 51 } },
+    { date: "2026-11-25T20:00:00Z", comp: "UCL", opponent: "Sporting CP", venue: "A", winProb: { mu: 44, draw: 25, opp: 32 } },
+    { date: "2026-11-28T15:00:00Z", comp: "PL", opponent: "Brentford", venue: "H", winProb: { mu: 48, draw: 25, opp: 27 } },
+    { date: "2026-12-02T20:15:00Z", comp: "PL", opponent: "Newcastle United", venue: "A", winProb: { mu: 42, draw: 25, opp: 34 } },
+    { date: "2026-12-05T15:00:00Z", comp: "PL", opponent: "Coventry City", venue: "H", winProb: { mu: 66, draw: 20, opp: 14 } },
+    { date: "2026-12-08T20:00:00Z", comp: "UCL", opponent: "RB Leipzig", venue: "H", winProb: { mu: 49, draw: 23, opp: 28 } },
+    { date: "2026-12-13T19:00:00Z", comp: "PL", opponent: "Crystal Palace", venue: "A", winProb: { mu: 46, draw: 25, opp: 28 } },
     { date: "2026-12-20T16:30:00Z", comp: "PL", opponent: "Arsenal", venue: "A" },
     { date: "2026-12-27T16:30:00Z", comp: "PL", opponent: "Nottingham Forest", venue: "H" },
     { date: "2026-12-30T19:30:00Z", comp: "PL", opponent: "Sunderland", venue: "H" },
     { date: "2027-01-02T12:30:00Z", comp: "PL", opponent: "Brighton & Hove Albion", venue: "A" },
     { date: "2027-01-07T20:00:00Z", comp: "PL", opponent: "Newcastle United", venue: "H" },
-    { date: "2027-01-20T20:00:00Z", comp: "UCL", opponent: "Bayern Munich", venue: "H" },
-    { date: "2027-01-27T20:00:00Z", comp: "UCL", opponent: "Villarreal", venue: "A" }
+    { date: "2027-01-20T20:00:00Z", comp: "UCL", opponent: "Bayern Munich", venue: "H", winProb: { mu: 24, draw: 21, opp: 55 } },
+    { date: "2027-01-27T20:00:00Z", comp: "UCL", opponent: "Villarreal", venue: "A", winProb: { mu: 41, draw: 24, opp: 35 } }
   ],
   seasonPhysical: {
     topSpeed: { player: "Mbeumo", kmh: 35.4, source: "FotMob (9-р сарын сүүл)" },
