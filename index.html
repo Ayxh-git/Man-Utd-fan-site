@@ -490,6 +490,7 @@ function renderGoals(){
 const QZ = window.MU_QUIZ, QC = window.MU_QUIZ_CONFIG || {};
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
+if(QC.resetAt && lsGet('mu-quiz-reset','')!==QC.resetAt){ try{ Object.keys(localStorage).filter(k=>/^mu-quiz-\d{4}-W\d+$/.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){} lsSet('mu-quiz-reset',QC.resetAt); }
 function currentWeek(){
   if(!QZ||!QZ.weeks.length) return null;
   const now=new Date(); const ok=QZ.weeks.filter(w=>new Date(w.start+'T00:00:00')<=now);
@@ -498,7 +499,7 @@ function currentWeek(){
 const sbHeaders = () => QC.supabaseKey.startsWith('sb_') ? {apikey:QC.supabaseKey} : {apikey:QC.supabaseKey, Authorization:'Bearer '+QC.supabaseKey};
 const lbOn = () => !!(QC.supabaseUrl && QC.supabaseKey);
 async function lbFetch(week){
-  const u=`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores?week=eq.${encodeURIComponent(week)}&select=name,score,time_ms&order=score.desc,time_ms.asc&limit=200`;
+  const u=`${QC.supabaseUrl.replace(/\/$/,'')}/rest/v1/quiz_scores?week=eq.${encodeURIComponent(week)}${QC.resetAt?'&created_at=gte.'+encodeURIComponent(QC.resetAt):''}&select=name,score,time_ms&order=score.desc,time_ms.asc&limit=200`;
   const r=await fetch(u,{headers:sbHeaders()});
   if(!r.ok) throw new Error(r.status);
   const rows=await r.json(), seen=new Set(), top=[];

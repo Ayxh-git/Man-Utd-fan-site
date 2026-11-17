@@ -4,7 +4,7 @@ window.MU_QUIZ = {
   weeks: [
     {
       id: "2026-W47",
-      start: "2026-11-16",
+      start: "2026-11-17",
       title: "Түүх ба домог",
       questions: [
         { q: "Манчестер Юнайтед 1878 онд ямар нэртэйгээр байгуулагдсан бэ?", o: ["Manchester Central", "Newton Heath LYR", "Ardwick AFC", "Salford Rovers"], a: 1, e: "Ланкашир-Йоркширын төмөр замын ажилчид Newton Heath LYR нэрээр байгуулсан." },
