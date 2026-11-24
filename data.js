@@ -7,12 +7,12 @@
 // Шинэ тоглолт болгоны дараа энэ файлыг шинэчилнэ.
 window.MU_DATA = {
   season: "2026/27",
-  updated: "2026-11-23",
+  updated: "2026-11-24",
   sources: {
     ratings: "Sportsdunia",
     physical: "FotMob (United in Focus, readmanutd)",
     stats: "Sportradar",
-    winProb: "StatsUltra (15 000 улирлын симуляц, 2026-11-23)"
+    winProb: "StatsUltra (15 000 улирлын симуляц, 2026-11-24)"
   },
   matches: [
     {
@@ -328,7 +328,7 @@ window.MU_DATA = {
   injuries: {"updated":"2026-11-22","source":"Sports Mole (2026-11-22)","list":[{"player":"Rashford","injury":"Түнх (гуя руу тархсан)","ret":"Тодорхойгүй (Sporting-той тоглох магадлал бага)"},{"player":"Baleba","injury":"Шөрмөс (hamstring)","ret":"12-р сарын 2 (Newcastle)"},{"player":"Sesko","injury":"Шилбэ (дахин сэдэрсэн)","ret":"2027 оны эхээр (тодорхойгүй)"},{"player":"Ugarte","injury":"Өвдөг (ДАШТ-д авсан хүнд гэмтэл)","ret":"Тодорхойгүй (хавраас өмнө биш)"}]},
   fixtures: [
     { date: "2026-11-25T20:00:00Z", comp: "UCL", opponent: "Sporting CP", venue: "A", winProb: { mu: 41, draw: 25, opp: 34 } },
-    { date: "2026-11-28T15:00:00Z", comp: "PL", opponent: "Brentford", venue: "H", winProb: { mu: 45, draw: 25, opp: 30 } },
+    { date: "2026-11-28T15:00:00Z", comp: "PL", opponent: "Brentford", venue: "H", winProb: { mu: 42, draw: 25, opp: 32 } },
     { date: "2026-12-02T20:15:00Z", comp: "PL", opponent: "Newcastle United", venue: "A", winProb: { mu: 38, draw: 24, opp: 37 } },
     { date: "2026-12-05T15:00:00Z", comp: "PL", opponent: "Coventry City", venue: "H", winProb: { mu: 63, draw: 21, opp: 17 } },
     { date: "2026-12-08T20:00:00Z", comp: "UCL", opponent: "RB Leipzig", venue: "H", winProb: { mu: 45, draw: 23, opp: 32 } },
